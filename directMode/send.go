@@ -1,4 +1,4 @@
-package fanoutMode
+package directMode
 
 import (
 	"github.com/streadway/amqp"
@@ -17,28 +17,31 @@ func send() {
 	ch, err := conn.Channel()
 	rabbitmq.ErrorHandle(err, "Failed to create channel")
 
+	//声明交换器
 	err = ch.ExchangeDeclare(
-		"logs",   //交换机的名字
-		"fanout", //交换机类型
-		true,     //durable
-		false,    //autoDelete
-		false,    //internal
-		false,    //noWait
-		nil,      //args
+		"direct.logs",
+		"direct",
+		false,
+		false,
+		false,
+		false,
+		nil,
 	)
+	rabbitmq.ErrorHandle(err, "Filed to declare exchange")
+
+	//发送消息
 	for i := 0; i < 10; i++ {
-		rabbitmq.ErrorHandle(err, "Failed to declare exchange")
 		body := "message" + strconv.Itoa(i)
 		err = ch.Publish(
-			"logs",
-			"",
+			"direct.logs",
+			"log1",
 			false,
 			false,
 			amqp.Publishing{
-				ContentType: "text/plain",
 				Body:        []byte(body),
+				ContentType: "text/plain",
 			},
 		)
-		rabbitmq.ErrorHandle(err, "Failed to publish")
 	}
+	rabbitmq.ErrorHandle(err, "Failed to publish message")
 }

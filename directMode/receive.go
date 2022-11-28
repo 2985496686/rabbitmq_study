@@ -1,4 +1,4 @@
-package fanoutMode
+package directMode
 
 import (
 	"github.com/streadway/amqp"
@@ -30,8 +30,8 @@ func receiveLog1() {
 	//将队列绑定到交换机上
 	err = ch.QueueBind(
 		queue.Name,
-		"", //router key
-		"logs",
+		"log1", //router key
+		"direct.logs",
 		false,
 		nil,
 	)
@@ -40,7 +40,7 @@ func receiveLog1() {
 	message, err := ch.Consume(
 		queue.Name,
 		"",
-		false,
+		true,
 		false,
 		false,
 		false,
@@ -65,28 +65,28 @@ func receiveLog2() {
 
 	//声明队列
 	queue, err := ch.QueueDeclare(
-		"",    //队列名字，若不指定，会随机生成一个唯一的名字，这种方式也是推荐使用的
-		false, //durable
-		false, //autoDelete
-		true,  //exclusive
-		false, //noWait
-		nil,   //args
+		"",
+		false,
+		false,
+		true,
+		false,
+		nil,
 	)
 
 	//将队列绑定到交换机上
 	err = ch.QueueBind(
 		queue.Name,
-		"",     //router key
-		"logs", //exchange
-		false,  //noWait
-		nil,    //args
+		"log2", //router key
+		"direct.logs",
+		false,
+		nil,
 	)
 	rabbitmq.ErrorHandle(err, "Filed to bind queue")
 
 	message, err := ch.Consume(
 		queue.Name,
 		"",
-		false,
+		true,
 		false,
 		false,
 		false,
