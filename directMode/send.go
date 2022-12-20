@@ -16,7 +16,6 @@ func send() {
 	//创建通道
 	ch, err := conn.Channel()
 	rabbitmq.ErrorHandle(err, "Failed to create channel")
-
 	//声明交换器
 	err = ch.ExchangeDeclare(
 		"direct.logs",
